@@ -1,0 +1,123 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Update Patters</title>
+		<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"> -->
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+    <div class="container">
+				<h1>Coffee House Chains</h1>  
+				<p>A ranking of selected leading coffee house chains worldwide<p>
+		</div>
+		<div class="group"> 
+			<label for="group-by">Group By:</label>
+			<select id="group-by">
+					<option value="stores">Stores worldwide</option>
+					<option value="revenue">Revenue in billion U.S. dollars</option>
+			</select>
+			<button class="button" id="sort">Sort</button>
+		</div>
+    <div class="chart">
+    </div>
+
+    <script>
+				let type = document.querySelector("#group-by").value;
+				let sortDirection = 0;
+
+        const margin = {top: 50, right: 20, bottom: 20, left: 50}
+        const width = 800 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+      
+        const svg = d3.select('.chart').append('svg')
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        
+        const xScale = d3.scaleBand()
+            // .domain(data.map(d => d.company))
+            .range([0, width])
+            .paddingInner(0.1)
+        
+        const yScale = d3.scaleLinear()
+            // .domain([0,d3.extent(data, d=>d.stores)[1]])
+            .range([height, 0])
+    
+        const xAxis = d3.axisBottom().scale(xScale);
+        
+        const yAxis = d3.axisLeft().scale(yScale);
+            
+        svg.append("g")
+            .attr("class", "x-axis")
+            .call(xAxis)
+            .attr("transform", `translate(0, ${height})`);
+    
+        svg.append("g")
+            .attr("class", "y-axis")
+            .call(yAxis)
+            .attr("transform", `translate(0 , 0)`);
+        
+        svg.append("text")
+            .attr('class', 'axis-title')
+            .attr('x', -10)
+            .attr('y', -10)
+            .text("Stores")  
+            .attr("font-size", "14px")
+    
+        function update(data, type){
+						sortDirection === 0 ? data = data.sort((a,b) => b[type] - a[type]) : data = data.sort((a,b) => a[type] - b[type]) 
+            xScale.domain(data.map(d => d.company))
+						yScale.domain([0, d3.max(data,d=>d[type])])
+						console.log(data)
+            const bars = svg.selectAll('rect')
+						.data(data, d=>d.company)
+
+						bars.enter()
+						.append('rect')
+						.merge(bars)
+            .transition()
+						.duration(1000) 
+						.attr('x', d => xScale(d.company))
+						.attr('y', d => yScale(d[type]))
+            .attr('width', xScale.bandwidth())
+						.attr('height', d=> height - yScale(d[type]))
+						.attr('fill', 'lightblue')
+						.attr('stroke', 'black')
+						.attr('opacity', 0.8)
+						.attr('class', 'income')
+
+            bars.exit().remove();
+
+            svg.select('.x-axis')
+              .transition()
+              .duration(1000) 
+              .call(xAxis)
+            svg.select('.y-axis')
+              .transition()
+              .duration(1000) 
+              .call(yAxis)
+
+            type === "stores" ? svg.select('.axis-title').text("Stores") : svg.select('.axis-title').text("Billion USD")
+            }
+        d3.csv('coffee-house-chains.csv', d3.autoType).then(data=>{
+					update(data, type);
+					document.querySelector("#sort").addEventListener('click', (event) => {
+						sortDirection === 0 ? sortDirection = 1 : sortDirection = 0;
+						update(data, type)
+					})
+					document.querySelector("#group-by").addEventListener('change', (event) => {
+            type = event.target.value;
+						update(data, type)})
+
+})
+
+
+    </script>
+</body>
+</html>

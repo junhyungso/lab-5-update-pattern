@@ -1,0 +1,39 @@
+.button {
+  background-color: salmon;
+  border: thick;
+  border-radius: 30px;
+  color: white;
+  padding: 5px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+select {
+    width: 100%;
+    min-width: 10ch;
+    max-width: 30ch;
+    border: 1px solid var(--select-border);
+    border-radius: 0.25em;
+    padding: 0.25em 0.5em;
+    font-size: 16px;
+    font-family: serif;
+    color: darkslategray;
+    cursor: pointer;
+    line-height: 1.1;
+    background-color: #fff;
+}
+
+h1 {
+    color: purple;
+    font-family: serif;
+    font-style: italic;
+    font-size: 40px;
+}
+
+p {
+    font-size: 20px;
+    color: darkslategray;
+}
+
